@@ -113,7 +113,22 @@ public class Livre {
     }
 
 
-  
+    public void getAllBooks() throws SQLException {
+        try (Connection con = Dbconnection.getConnection();) {
+
+            Statement st = con.createStatement();
+            //String qr = "SELECT * FROM books INNER JOIN author ON books.authorId = author.id";
+            String qr = "SELECT * FROM livres";
+            ResultSet res = st.executeQuery(qr);
+            while (res.next()) {
+                //System.out.println(res.getString("title") + res.getString("authorName") + res.getInt("id"));
+                System.out.println(res.getString("title") + res.getString("num_isbn") + res.getInt("id"));
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     //methodes
     public void ajouterLivre(Livre livre){

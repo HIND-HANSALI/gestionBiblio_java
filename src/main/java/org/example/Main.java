@@ -75,6 +75,8 @@ public class Main {
                    livre.ajouterLivre(nouveauLivre);
                    break;
 
+                case 6:
+                        livre.getAllBooks();
                 case 7:
                     // Exit the program
                     scanner.close();
