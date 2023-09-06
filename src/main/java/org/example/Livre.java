@@ -164,7 +164,19 @@ public class Livre {
     }
 
 
-
+    public int DeleteBook(String title,String isbn) throws Exception{
+        int status = 0;
+        try {
+            Connection connection = Dbconnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement("DELETE FROM livres WHERE livres.title = ? and livres.num_isbn = ?");
+            ps.setString(1, title);
+            ps.setString(2, isbn);
+            status = ps.executeUpdate();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return status;
+    }
 
 
     public Livre editLivre(int id){

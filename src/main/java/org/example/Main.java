@@ -74,7 +74,21 @@ public class Main {
                    Livre nouveauLivre = new Livre(id,title,numIsbn ,quantityTotal,quantityLost,quantityReserved,auteur,quantityAvailable,bibliotecaire);
                    livre.ajouterLivre(nouveauLivre);
                    break;
+                case 3:
+                    System.out.println("Enter Book Name");
+                    String name = scanner.nextLine();
+                    System.out.println("Enter book ISBN");
+                    String isbn = scanner.nextLine();
 
+                    int status = livre.DeleteBook(name,isbn);
+                    if(status == 1 )
+                    {
+                        System.out.println("Book deleted successfully");
+                    }
+                    else
+                    {
+                        System.out.println("ERROR while deleting product");
+                    }
                 case 6:
                         livre.getAllBooks();
                 case 7:
