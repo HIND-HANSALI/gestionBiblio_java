@@ -39,9 +39,9 @@ public class Main {
                case 1:
                    System.out.println("1. Insert New Book Informations");
 
-                   System.out.print("Enter the id book: ");
+                   /*System.out.print("Enter the id book: ");
                    int id = scanner.nextInt();
-                   scanner.nextLine();
+                   scanner.nextLine();*/
 
                    System.out.print("Enter the title of the book: ");
                    String title = scanner.nextLine();
@@ -61,26 +61,39 @@ public class Main {
                    System.out.println("Enter book QuantityTotal:");
                    int quantityTotal = scanner.nextInt();
 
-                   System.out.println("Enter book quantity Lost:");
-                   int quantityLost = scanner.nextInt();
+                   //System.out.println("Enter book quantity Lost:");
+                   //int quantityLost = scanner.nextInt();
+                   int quantityLost=0;
+                   //System.out.println("Enter book quantity Reserved:");
+                   //int quantityReserved = scanner.nextInt();
+                   int quantityReserved =0;
+                   //System.out.println("Enter book quantity Available:");
+                   int quantityAvailable = quantityTotal;
 
-                   System.out.println("Enter book quantity Reserved:");
-                   int quantityReserved = scanner.nextInt();
-                   System.out.println("Enter book quantity Available:");
-                   int quantityAvailable = scanner.nextInt();
 
 
-
-                   Livre nouveauLivre = new Livre(id,title,numIsbn ,quantityTotal,quantityLost,quantityReserved,auteur,quantityAvailable,bibliotecaire);
+                   Livre nouveauLivre = new Livre(title,numIsbn ,quantityTotal,quantityLost,quantityReserved,auteur,quantityAvailable,bibliotecaire);
                    livre.ajouterLivre(nouveauLivre);
                    break;
-                case 3:
-                    System.out.println("Enter Book Name");
-                    String name = scanner.nextLine();
-                    System.out.println("Enter book ISBN");
-                    String isbn = scanner.nextLine();
+                case 2 :
+                    System.out.print("Enter ISBN of the book to update: ");
+                    String livreisbn = scanner.next();
+                     livre.ShowBookByIsbn(livreisbn);
+                     break;
 
-                    int status = livre.DeleteBook(name,isbn);
+                case 8:
+                    //System.out.print("Enter the title or auteur of the book to search: ");
+                   // String livretitle= scanner.next();
+
+
+                    //livre.searchBookByTitle(livretitle);
+                    //break;
+                case 5:
+                    //remove book
+                    //RemoveBook
+                    System.out.print("Enter book ISBN");
+                    String isbn = scanner.nextLine();
+                    int status = livre.RemoveBook(isbn);
                     if(status == 1 )
                     {
                         System.out.println("Book deleted successfully");
@@ -89,12 +102,30 @@ public class Main {
                     {
                         System.out.println("ERROR while deleting product");
                     }
+                    break;
+                case 3:
+                    System.out.println("Enter Book Name");
+                    String name = scanner.nextLine();
+                    System.out.println("Enter book ISBN");
+                    String isbn1 = scanner.nextLine();
+
+                    int status1 = livre.DeleteBook(name,isbn1);
+                    if(status1 == 1 )
+                    {
+                        System.out.println("Book deleted successfully");
+                    }
+                    else
+                    {
+                        System.out.println("ERROR while deleting product");
+                    }
+                    break;
                 case 6:
                         livre.getAllBooks();
+                    break;
                 case 7:
                     // Exit the program
-                    scanner.close();
-                    System.exit(0);
+                    //scanner.close();
+                    //System.exit(0);
 
                 default:
                     System.out.println("Invalid choice");
@@ -124,6 +155,14 @@ public class Main {
         nouveauLivre.ajouterLivre(nouveauLivre);*/
 
 
+
+        /*Auteur auteur = new Auteur(1, "victor", "victor@gmail.com");
+
+        Bibliothecaire bibliotecaire = new Bibliothecaire(1, "hind","hind@gmail.com");
+
+        Livre nouveauLivre = new Livre(7,"1123","testibnupdated",10,0,0,auteur,10,bibliotecaire);
+
+        nouveauLivre.updateLivre(nouveauLivre);*/
 
 
     }

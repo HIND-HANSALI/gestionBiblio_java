@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Livre {
+
     private int id;
     private String title;
     private String numIsbn;
@@ -32,6 +33,28 @@ public class Livre {
         this.qtedisponible = qtedisponible;
         this.bibliotecaire = bibliotecaire;
     }
+    public Livre(String title, String numIsbn, int qteTotal, int qtePerdu, int qteEmprunter, Auteur auteur, int qtedisponible, Bibliothecaire bibliotecaire) {
+
+        this.title = title;
+        this.numIsbn = numIsbn;
+        this.qteTotal = qteTotal;
+        this.qtePerdu = qtePerdu;
+        this.qteEmprunter = qteEmprunter;
+        this.auteur = auteur;
+        this.qtedisponible = qtedisponible;
+        this.bibliotecaire = bibliotecaire;
+    }
+
+    /*public Livre(String numIsbn, String title, String  auteur, String bibliotecaire, int qteTotal, int qtePerdu, int qteEmprunte, int qteDisponible) {
+        this.title = title;
+        this.numIsbn = numIsbn;
+        this.qteTotal = qteTotal;
+        this.qtePerdu = qtePerdu;
+        this.qteEmprunter = qteEmprunte;
+        this.auteur = auteur;
+        this.qtedisponible = qteDisponible;
+        this.bibliotecaire = bibliotecaire;
+    }*/
 
     public int getQtedisponible() {
         return qtedisponible;
@@ -114,15 +137,18 @@ public class Livre {
 
 
     public void getAllBooks() throws SQLException {
-        try (Connection con = Dbconnection.getConnection();) {
+        try (Connection con = Dbconnection.getConnection()) {
 
             Statement st = con.createStatement();
             //String qr = "SELECT * FROM books INNER JOIN author ON books.authorId = author.id";
-            String qr = "SELECT * FROM livres";
+            //String qr = "SELECT * FROM livres";
+            String qr="SELECT title,num_isbn,auteurs.name as auteurs,bibliotecaires.name as bibliotecaires,qteTotal, qtePerdu,qteEmprunte,qteDisponible FROM livres INNER JOIN auteurs on livres.auteur_id=auteurs.id INNER JOIN bibliotecaires on livres.bibliotecaire_id=bibliotecaires.id";
             ResultSet res = st.executeQuery(qr);
+            //String auteur = res.getString("auteurs");
+
+            //String bibliotecaire = res.getString("bibliotecaires");
             while (res.next()) {
-                //System.out.println(res.getString("title") + res.getString("authorName") + res.getInt("id"));
-                System.out.println(res.getString("title") + res.getString("num_isbn") + res.getInt("id"));
+                System.out.println("Titre: " + res.getString("title") + ",Numero ISBN: " + res.getString("num_isbn")  );
             }
 
         } catch (SQLException e) {
@@ -156,13 +182,69 @@ public class Livre {
             statement.setInt(8, livre.getBibliotecaire().getId());
 
             statement.executeUpdate();
-        }catch (
-                SQLException e) {
+        }catch (SQLException e) {
             System.out.println("Aucune connexion n'a été établie.");
         }
 
     }
 
+    public void updateLivre(Livre livre) {
+        Connection connection = Dbconnection.getConnection();
+
+        try {
+            String sql = "UPDATE livres SET num_isbn=?,title=?,qteTotal=?, qtePerdu=?, qteEmprunte=?,qteDisponible=?, auteur_id=?,bibliotecaire_id=? WHERE isbn=?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, livre.getNumIsbn());
+            statement.setString(1, livre.getTitle());
+            statement.setInt(2, livre.getQteTotal());
+            statement.setInt(3, livre.getQtePerdu());
+            statement.setInt(4, livre.getQteEmprunter());
+            statement.setInt(5, livre.getQtedisponible());
+            statement.setInt(6, livre.getAuteur().getId());
+            statement.setInt(7, livre.getBibliotecaire().getId());
+
+             statement.executeUpdate();
+        }catch (SQLException e) {
+            System.out.println("Aucune connexion n'a été établie.");
+
+        }
+
+    }
+    public void ShowBookByIsbn(String isbn) {
+        Connection connection = Dbconnection.getConnection();
+
+        try {
+            //String sql1 = "SELECT * FROM livres WHERE num_isbn=? ";
+            String sql="SELECT title,num_isbn,auteurs.name as auteurs,bibliotecaires.name as bibliotecaires,qteTotal, qtePerdu,qteEmprunte,qteDisponible FROM livres INNER JOIN auteurs on livres.auteur_id=auteurs.id INNER JOIN bibliotecaires on livres.bibliotecaire_id=bibliotecaires.id like num_isbn=?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, isbn);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+
+                //System.out.println("hind");
+
+                String title = resultSet.getString("title");
+                String auteur = resultSet.getString("auteurs");
+                String bibliotecaire = resultSet.getString("bibliotecaires");
+                int qteTotal= resultSet.getInt("qteTotal");
+                int qtePerdu= resultSet.getInt("qtePerdu");
+                int qteEmprunte = resultSet.getInt("qteEmprunte");
+                int qteDisponible = resultSet.getInt("qteDisponible");
+
+                System.out.println("Titre: " + title + ", Auteur: " + auteur + ", Bibliothécaire: " + bibliotecaire + ", Quantité totale: " + qteTotal + ", Quantité perdue: " + qtePerdu + ", Quantité empruntée: " + qteEmprunte + ", Quantité disponible: " + qteDisponible);
+
+
+            } else {
+                System.out.println("No book with this isbn");
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+
+        }
+    }
+    
 
     public int DeleteBook(String title,String isbn) throws Exception{
         int status = 0;
@@ -177,6 +259,22 @@ public class Livre {
         }
         return status;
     }
+    public int RemoveBook(String isbn) throws Exception{
+        int status = 0;
+        try {
+            Connection connection = Dbconnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement("DELETE FROM livres WHERE  livres.num_isbn = ?");
+            ps.setString(1, isbn);
+
+            status = ps.executeUpdate();
+
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return status;
+    }
+
+
 
 
     public Livre editLivre(int id){
@@ -211,13 +309,5 @@ public class Livre {
         return livresTrouves;
     }
 
-    public static void main(String[] args) {
-        //Livre livre1 = new Livre(1, "Le nom du livre","A122",4,2,2,1,2);
-        Livre livre1=new Livre();
-        livre1.title="dernier jour";
 
-        //livre1.setTitle("hind");
-        System.out.println(livre1.getTitle());
-
-    }
 }
