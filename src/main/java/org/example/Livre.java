@@ -244,7 +244,41 @@ public class Livre {
 
         }
     }
-    
+    public void searchBookByTitle(String title){
+        Connection connection = Dbconnection.getConnection();
+
+
+        try {
+            //String sql1 = "SELECT * FROM livres WHERE num_isbn=? ";
+            String sql="SELECT title,num_isbn,auteurs.name as auteurs,bibliotecaires.name as bibliotecaires,qteTotal, qtePerdu,qteEmprunte,qteDisponible FROM livres INNER JOIN auteurs on livres.auteur_id=auteurs.id INNER JOIN bibliotecaires on livres.bibliotecaire_id=bibliotecaires.id WHERE auteurs.name LIKE ? OR title LIKE ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, "%" + title + "%");
+            statement.setString(2, "%" + title + "%");
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+
+                //System.out.println("hind");
+
+                String titlee = resultSet.getString("title");
+                String auteur1 = resultSet.getString("auteurs");
+                String bibliotecaire = resultSet.getString("bibliotecaires");
+                int qteTotal= resultSet.getInt("qteTotal");
+                int qtePerdu= resultSet.getInt("qtePerdu");
+                int qteEmprunte = resultSet.getInt("qteEmprunte");
+                int qteDisponible = resultSet.getInt("qteDisponible");
+
+                System.out.println("Titre: " + titlee + ", Auteur: " + auteur1 + ", Bibliothécaire: " + bibliotecaire + ", Quantité totale: " + qteTotal + ", Quantité perdue: " + qtePerdu + ", Quantité empruntée: " + qteEmprunte + ", Quantité disponible: " + qteDisponible);
+
+
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+
+        }
+
+    }
+
 
     public int DeleteBook(String title,String isbn) throws Exception{
         int status = 0;

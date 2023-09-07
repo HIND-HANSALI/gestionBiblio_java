@@ -82,12 +82,10 @@ public class Main {
                      break;
 
                 case 8:
-                    //System.out.print("Enter the title or auteur of the book to search: ");
-                   // String livretitle= scanner.next();
-
-
-                    //livre.searchBookByTitle(livretitle);
-                    //break;
+                    System.out.print("Enter the title or auteur of the book to search: ");
+                    String livretitle= scanner.next();
+                    livre.searchBookByTitle(livretitle);
+                    break;
                 case 5:
                     //remove book
                     //RemoveBook
