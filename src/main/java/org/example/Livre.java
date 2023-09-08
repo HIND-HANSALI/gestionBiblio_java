@@ -1,5 +1,6 @@
 package org.example;
 import database.Dbconnection;
+import helper.Printer;
 
 import java.lang.reflect.Array;
 import java.sql.*;
@@ -43,6 +44,17 @@ public class Livre {
         this.auteur = auteur;
         this.qtedisponible = qtedisponible;
         this.bibliotecaire = bibliotecaire;
+    }
+    public Livre(String title, int qteTotal, int qtePerdu, int qteEmprunter, Auteur auteur, int qtedisponible) {
+
+        this.title = title;
+
+        this.qteTotal = qteTotal;
+        this.qtePerdu = qtePerdu;
+        this.qteEmprunter = qteEmprunter;
+        this.auteur = auteur;
+        this.qtedisponible = qtedisponible;
+        //this.bibliotecaire = bibliotecaire;
     }
 
     /*public Livre(String numIsbn, String title, String  auteur, String bibliotecaire, int qteTotal, int qtePerdu, int qteEmprunte, int qteDisponible) {
@@ -188,20 +200,27 @@ public class Livre {
 
     }
 
-    public void updateLivre(Livre livre) {
+
+
+
+    public void updateLivre(Livre livre ,  String livreisbn) {
         Connection connection = Dbconnection.getConnection();
 
         try {
-            String sql = "UPDATE livres SET num_isbn=?,title=?,qteTotal=?, qtePerdu=?, qteEmprunte=?,qteDisponible=?, auteur_id=?,bibliotecaire_id=? WHERE isbn=?";
+            String sql = "UPDATE livres SET title=?,qteTotal=?, qtePerdu=?, qteEmprunte=?,qteDisponible=?, auteur_id=? WHERE num_isbn=?";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, livre.getNumIsbn());
+            //statement.setString(1, livre.getNumIsbn());
             statement.setString(1, livre.getTitle());
             statement.setInt(2, livre.getQteTotal());
             statement.setInt(3, livre.getQtePerdu());
             statement.setInt(4, livre.getQteEmprunter());
             statement.setInt(5, livre.getQtedisponible());
             statement.setInt(6, livre.getAuteur().getId());
-            statement.setInt(7, livre.getBibliotecaire().getId());
+            statement.setString(7, livreisbn);
+            //statement.setInt(7, livre.getBibliotecaire().getId());
+
+            System.out.println(statement);
+
 
              statement.executeUpdate();
         }catch (SQLException e) {
@@ -215,7 +234,7 @@ public class Livre {
 
         try {
             //String sql1 = "SELECT * FROM livres WHERE num_isbn=? ";
-            String sql="SELECT title,num_isbn,auteurs.name as auteurs,bibliotecaires.name as bibliotecaires,qteTotal, qtePerdu,qteEmprunte,qteDisponible FROM livres INNER JOIN auteurs on livres.auteur_id=auteurs.id INNER JOIN bibliotecaires on livres.bibliotecaire_id=bibliotecaires.id like num_isbn=?";
+            String sql="SELECT title,num_isbn,auteurs.name as auteurs,bibliotecaires.name as bibliotecaires,qteTotal, qtePerdu,qteEmprunte,qteDisponible FROM livres INNER JOIN auteurs on livres.auteur_id=auteurs.id INNER JOIN bibliotecaires on livres.bibliotecaire_id=bibliotecaires.id where num_isbn=?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, isbn);
 
@@ -224,7 +243,7 @@ public class Livre {
             if (resultSet.next()) {
 
                 //System.out.println("hind");
-
+                String isbnum = resultSet.getString("num_isbn");
                 String title = resultSet.getString("title");
                 String auteur = resultSet.getString("auteurs");
                 String bibliotecaire = resultSet.getString("bibliotecaires");
@@ -233,7 +252,7 @@ public class Livre {
                 int qteEmprunte = resultSet.getInt("qteEmprunte");
                 int qteDisponible = resultSet.getInt("qteDisponible");
 
-                System.out.println("Titre: " + title + ", Auteur: " + auteur + ", Bibliothécaire: " + bibliotecaire + ", Quantité totale: " + qteTotal + ", Quantité perdue: " + qtePerdu + ", Quantité empruntée: " + qteEmprunte + ", Quantité disponible: " + qteDisponible);
+                System.out.println("Titre: " + title + ",Numero ISBN:"+isbnum+", Auteur: " + auteur + ", Bibliothécaire: " + bibliotecaire + ", Quantité totale: " + qteTotal + ", Quantité perdue: " + qtePerdu + ", Quantité empruntée: " + qteEmprunte + ", Quantité disponible: " + qteDisponible);
 
 
             } else {
@@ -311,6 +330,7 @@ public class Livre {
 
 
 
+
     public Livre editLivre(int id){
     return new Livre();
     }
@@ -327,9 +347,6 @@ public class Livre {
         return livresEmpruntes;
     }
 
-
-
-
     public List<Livre> afficherAllLivres(){
         List<Livre> Alllivres = new ArrayList<>();
         return Alllivres;
@@ -343,5 +360,64 @@ public class Livre {
         return livresTrouves;
     }
 
+
+
+
+    public  Livre getLivreBySbn(String sbn)  {
+        String query = "SELECT * FROM livres WHERE num_isbn = ?";
+        try (PreparedStatement preparedStatement =Dbconnection.getConnection().prepareStatement(query)) {
+            try {
+                preparedStatement.setString(1, sbn);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return mapData(resultSet);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public  Livre mapData(ResultSet resultSet)  {
+        try {
+            if (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String title = resultSet.getString("title");
+                String numIsbn = resultSet.getString("num_isbn");
+                int qteTotal = resultSet.getInt("qteTotal");
+                int qtePerdu = resultSet.getInt("qtePerdu");
+                int qteEmprunter = resultSet.getInt("qteEmprunte");
+                int qtedisponible = resultSet.getInt("qteDisponible");
+
+
+
+                Livre livre = new Livre();
+                livre.setId(id);
+                livre.setTitle(title);
+                livre.setNumIsbn(numIsbn);
+                livre.setQteTotal(qteTotal);
+                livre.setQtePerdu(qtePerdu);
+                livre.setQteEmprunter(qteEmprunter);
+                livre.setQtedisponible(qtedisponible);
+
+                return livre;
+            } else {
+                return null; // No data in the ResultSet
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public static void main(String[] args) {
+         Livre livre = new Livre();
+
+        Printer.printModel(livre.getLivreBySbn("YU876"));
+    }
 
 }
